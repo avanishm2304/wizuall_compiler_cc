@@ -1,0 +1,73 @@
+// Testing slicing, reversing, permutations, products, comparisons, ordering from CSV data
+
+// 1. Load data from CSV
+raw_ops_data = load_csv("vector_ops_data.csv");
+
+// 2. Extract columns into Wizuall variables
+vec_a = get_column(raw_ops_data, 0); // Should be [1, 5, 2, 8, 3]
+vec_b = get_column(raw_ops_data, 1); // Should be [9, 4, 7, 2, 6]
+
+// 3. Define scalar in Wizuall
+scalar_val = 10;
+
+// 4. Wizuall Built-in Operations
+sub_vec_a = slice_vector(vec_a, 1, 4); // Indices 1, 2, 3 -> [5, 2, 8]
+rev_vec_b = reverse_vector(vec_b);     // [6, 2, 7, 4, 9]
+elem_prod = vec_a * vec_b;             // [9, 20, 14, 16, 18]
+is_a_lt_b = vec_a < vec_b;             // [True, False, True, False, True] (NumPy bool array)
+
+// 5. Native Code Block for printing Wizuall results & performing complex ops
+*-*
+import numpy as np
+
+print("\n--- test_csv_vector_ops.wiz Output ---")
+# Check if variables exist before using
+if 'vec_a' in locals() and 'vec_b' in locals() and 'sub_vec_a' in locals() and \
+   'rev_vec_b' in locals() and 'elem_prod' in locals() and 'is_a_lt_b' in locals() and \
+   'scalar_val' in locals():
+
+    # Convert Wizuall vectors (likely numpy arrays already) for consistent printing
+    np_a = np.array(vec_a)
+    np_b = np.array(vec_b)
+    np_sub_a = np.array(sub_vec_a)
+    np_rev_b = np.array(rev_vec_b)
+    np_elem_prod = np.array(elem_prod)
+    np_is_a_lt_b = np.array(is_a_lt_b) # Ensure it's treated as array
+
+    print(f"Vector A (from CSV Col 0): {np_a}")
+    print(f"Vector B (from CSV Col 1): {np_b}")
+    print(f"Slice of A (1-3, Wizuall): {np_sub_a}")
+    print(f"Reversed B (Wizuall): {np_rev_b}")
+    print(f"Element-wise Product (Wizuall): {np_elem_prod}")
+    print(f"Is A < B? (Wizuall): {np_is_a_lt_b}")
+
+    # --- Permutation (Native) ---
+    permuted_a = np.random.permutation(np_a)
+    print(f"Permuted A (Native): {permuted_a}")
+
+    # --- Dot Product (Native) ---
+    dot_prod = np.dot(np_a, np_b)
+    print(f"Dot Product (Native): {dot_prod}") # Should be 77
+
+    # --- Total Order (Sorting) (Native) ---
+    sorted_a = np.sort(np_a)
+    sort_indices_a = np.argsort(np_a)
+    print(f"Sorted A (Native): {sorted_a}")
+    print(f"Indices to sort A (Native): {sort_indices_a}")
+
+    # --- Binary Relation (Native) ---
+    # Example: Relation where a[i] + b[i] > scalar_val (Wizuall var)
+    sum_gt_scalar = (np_a + np_b) > scalar_val
+    print(f"Is A[i]+B[i] > {scalar_val}? (Native): {sum_gt_scalar}")
+
+    # --- Pareto Optimality (Conceptual - Native Code) ---
+    print("\nPareto Optimality (Conceptual):")
+    points = list(zip(np_a, np_b))
+    print(f"  Points: {points}")
+    print(f"  (Finding non-dominated points requires specific algorithm)")
+
+else:
+    print("Error: One or more Wizuall variables needed for the native block were not found.")
+
+print("--- End of Vector Ops Test ---")
+*-*

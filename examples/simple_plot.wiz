@@ -1,0 +1,85 @@
+// Testing plots, stats, loops, native calls with data from CSV
+
+// 1. Load XY data
+raw_xy_data = load_csv("loop_plot_xy.csv");
+vectorX = get_column(raw_xy_data, 0); // Get first numeric column ('x_axis')
+
+// 2. Calculate vectorY using Wizuall ops
+vectorY = vectorX * 2 + 5;
+
+// 3. Wizuall Plotting
+plot_xy(vectorX, vectorY);
+
+// 4. Load Histogram data
+raw_hist_data = load_csv("loop_hist_data.csv");
+data = get_column(raw_hist_data, 0); // Get first numeric column ('data_val')
+plot_histogram(data, 5);
+
+// 5. Wizuall Stats
+avg_data = calculate_average(data);
+
+// 6. Native Python block for printing and defining a function
+*-*
+# Native Python block
+import numpy as np # Ensure numpy is available
+import matplotlib.pyplot as plt # Ensure plt is available if needed later
+
+print("\n--- test_csv_loops_plots.wiz Output ---")
+if 'avg_data' in locals():
+    print(f"Average calculated by WizuALL (printed by Python): {avg_data}")
+else:
+    print("Warning: avg_data not found.")
+
+# Define native function
+def native_printer(val):
+  print(f"Printed from native_printer: {val}")
+*-*
+
+// 7. Call the native function from Wizuall
+native_printer(avg_data);
+
+// 8. Loop setup variables (Wizuall)
+threshold = 15;
+count = 0;
+index = 0;
+max_index = 10; // Should match length of vectorX/vectorY
+
+// 9. Wizuall Loop for conditional counting
+while (index < max_index) {
+  // Check if vectorY has enough elements before accessing
+  // NOTE: Wizuall itself doesn't have a built-in length check currently.
+  // This relies on the generated code/NumPy handling index access.
+  // A more robust implementation might check length in native code first.
+  current_y = vectorY[index];
+  if (current_y > threshold) {
+      count = count + 1;
+  }
+  index = index + 1;
+}
+
+// 10. Print loop result from native block
+*-*
+if 'count' in locals():
+    print(f"Number of Y values > {threshold} (within first {max_index}): {count}")
+else:
+    print("Warning: loop count variable not found.")
+*-*
+
+// 11. Wizuall vector operations
+revY = reverse_vector(vectorY);
+sliceY = slice_vector(vectorY, 2, 5); // Elements at index 2, 3, 4
+
+// 12. Print results from native block
+*-*
+if 'revY' in locals():
+    print(f"Reversed vectorY (first 5, NumPy slice): {np.array(revY)[:5]}")
+else:
+    print("Warning: revY not found.")
+
+if 'sliceY' in locals():
+    print(f"Slice of vectorY (index 2 to 4, Wizuall): {np.array(sliceY)}")
+else:
+    print("Warning: sliceY not found.")
+
+print("--- End of Loops/Plots Test ---")
+*-*

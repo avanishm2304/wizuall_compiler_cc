@@ -1,0 +1,89 @@
+// Testing Histogram, Scatter, XY plots (Wizuall),
+// Heatmap (native), Smoothed curve (native) using data from CSV
+
+// 1. Load data for Histogram
+raw_hist_data = load_csv("histogram_data.csv");
+hist_data = get_column(raw_hist_data, 0); // Get the first numeric column
+
+// 2. Load data for XY plots
+raw_xy_data = load_csv("xy_plot_data.csv");
+x_data = get_column(raw_xy_data, 0); // Get first numeric column ('x_coord')
+y_data = get_column(raw_xy_data, 1); // Get second numeric column ('y_coord')
+
+// 3. Built-in Wizuall Plots using loaded data
+plot_histogram(hist_data, 5);
+plot_scatter(x_data, y_data);
+plot_xy(x_data, y_data); // Plot loaded Y data directly
+
+// 4. Heatmap (Native code - creates its own data for this example)
+*-*
+import numpy as np
+import matplotlib.pyplot as plt
+
+print("\n--- test_csv_plots.wiz Output ---")
+# Verify loaded data if needed (accessing Wizuall variables)
+if 'hist_data' in locals():
+    print(f"Histogram data (from CSV): {hist_data}")
+if 'x_data' in locals() and 'y_data' in locals():
+    print(f"X data (from CSV): {x_data}")
+    print(f"Y data (from CSV): {y_data}")
+
+# --- Heatmap Section (Native Code) ---
+# Create some sample 2D data for heatmap (independent of CSV for this example)
+matrix_data = np.array([
+    [1, 5, 2],
+    [8, 3, 7],
+    [4, 9, 6]
+])
+print(f"\nMatrix Data for Heatmap (generated in Python):\n{matrix_data}")
+
+plt.figure()
+plt.imshow(matrix_data, cmap='viridis', interpolation='nearest')
+plt.colorbar(label='Value')
+plt.title('Heatmap (Native Code)')
+plt.xticks(np.arange(matrix_data.shape[1]), ['Col A', 'Col B', 'Col C'])
+plt.yticks(np.arange(matrix_data.shape[0]), ['Row 1', 'Row 2', 'Row 3'])
+plt.show()
+*-*
+
+// 5. Smoothed Curve (Native code - using loaded x_data, y_data)
+*-*
+# Requires scipy for interpolation/smoothing
+try:
+    from scipy.interpolate import make_interp_spline
+    scipy_available = True
+except ImportError:
+    print("\nScipy not found, cannot generate smoothed curve.")
+    scipy_available = False
+
+# Check if Wizuall variables exist before using them in Python
+if scipy_available and 'x_data' in locals() and 'y_data' in locals():
+    print("\nGenerating Smoothed Curve using data loaded via Wizuall...")
+    # Ensure data are numpy arrays
+    np_x = np.array(x_data)
+    np_y = np.array(y_data)
+
+    if len(np_x) > 3 and len(np_y) > 3 and len(np_x) == len(np_y): # Need enough points for cubic spline
+        # Define points for the smoothed curve
+        x_smooth = np.linspace(np_x.min(), np_x.max(), 300) # More points for smoothness
+
+        # Create spline object (k=3 for cubic spline)
+        spl = make_interp_spline(np_x, np_y, k=3)
+        y_smooth = spl(x_smooth) # Evaluate spline at smooth x points
+
+        plt.figure()
+        plt.scatter(np_x, np_y, label='Loaded Data (from CSV)', color='red')
+        plt.plot(x_smooth, y_smooth, label='Smoothed Curve (Spline)', color='blue')
+        plt.title('Smoothed Curve (Native Code, Data from CSV)')
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+    else:
+        print("Skipping smoothed curve: Need at least 4 matching X/Y data points loaded.")
+elif scipy_available:
+    print("Skipping smoothed curve: Could not find 'x_data' or 'y_data' loaded by Wizuall.")
+
+print("--- End of Plots Test ---")
+*-*

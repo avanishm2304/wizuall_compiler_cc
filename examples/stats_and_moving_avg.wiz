@@ -1,0 +1,59 @@
+// Testing basic stats (via Wizuall) and moving average (via native code) on CSV data
+
+// 1. Load all numeric data from CSV. Only 'value' column is numeric here.
+stats_raw_data = load_csv("stats_data.csv");
+
+// 2. Extract the column containing the data (first numeric column, index 0)
+data_for_stats = get_column(stats_raw_data, 0);
+
+// 3. Built-in Stats calculated using Wizuall functions on the extracted data
+avg_val = calculate_average(data_for_stats);
+max_val = calculate_max(data_for_stats);
+min_val = calculate_min(data_for_stats);
+sum_val = calculate_sum(data_for_stats);
+
+*-*
+# Native block to print Wizuall results and calculate/plot moving average
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+print("\n--- test_csv_stats.wiz Output ---")
+if 'data_for_stats' in locals() and data_for_stats is not None:
+    print(f"Data extracted from CSV (Col 0): {data_for_stats}")
+    # Print results calculated by Wizuall
+    print(f"Average (Wizuall calc): {avg_val}")
+    print(f"Max (Wizuall calc): {max_val}")
+    print(f"Min (Wizuall calc): {min_val}")
+    print(f"Sum (Wizuall calc): {sum_val}")
+
+    # -- Moving Average Calculation IN PYTHON --
+    # Define window size directly in Python for this example
+    window_size = 3
+
+    # Convert Wizuall vector 'data_for_stats' to Pandas Series
+    data_series = pd.Series(data_for_stats)
+    moving_avg = data_series.rolling(window=window_size).mean() # Calculate moving average
+    moving_avg_np = moving_avg.to_numpy() # Convert back to numpy array
+
+    print(f"Moving Average (window={window_size}): {moving_avg_np}")
+    # Note: First few values will be NaN as the window isn't full
+
+    # -- Plotting IN PYTHON --
+    # Ensure data_for_stats is a numpy array for consistent plotting
+    data_array = np.array(data_for_stats)
+    plt.figure()
+    plt.plot(data_array, label='Original Data (from CSV)', marker='o')
+    plt.plot(moving_avg_np, label=f'Moving Average (w={window_size})', marker='x')
+    plt.title('Data and Moving Average (from CSV)')
+    plt.xlabel('Index')
+    plt.ylabel('Value')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+else:
+    print("Error: 'data_for_stats' variable not found or is None. Cannot proceed.")
+
+print("--- End of Stats Test ---")
+*-*

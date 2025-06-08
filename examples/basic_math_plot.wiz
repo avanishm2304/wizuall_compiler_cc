@@ -1,0 +1,48 @@
+// Test loading CSV and using Wizuall functions (get_column, plot, calculations)
+
+// Load all numeric data from CSV into one Wizuall variable
+all_numeric_data = load_csv("test_data.csv");
+
+// Extract the columns needed using the new Wizuall function
+// Assumes 'x_values' was the 1st numeric col loaded, 'y_values' the 2nd.
+vector_x = get_column(all_numeric_data, 0);
+vector_y = get_column(all_numeric_data, 1);
+
+// Define a scalar offset
+scalar_offset = 10;
+
+// Perform vector math using standard Wizuall syntax
+plot_vec_x = vector_x + scalar_offset;
+plot_vec_y = vector_y * 2 - scalar_offset;
+
+// Plot using the derived Wizuall vectors
+plot_xy(plot_vec_x, plot_vec_y);
+
+// Calculate statistics using Wizuall functions
+total_sum = calculate_sum(plot_vec_y);
+average_y = calculate_average(plot_vec_y);
+
+*-*
+
+print("--- test_wizuall_csv.wiz Output ---")
+print("Loaded data shape (all numeric cols):", all_numeric_data.shape)
+print("Extracted X (col 0):", vector_x)
+print("Extracted Y (col 1):", vector_y)
+print("X for plotting:", plot_vec_x)
+print("Y for plotting:", plot_vec_y)
+print("Sum of Y:", total_sum)
+print("Average of Y:", average_y)
+*-*
+
+// Conditional logic using Wizuall syntax
+if (average_y > 45) { // Adjusted threshold based on sample data
+  message_code = 1;
+*-*
+print("Average is greater than 45. Message code:", message_code)
+*-*
+} else {
+   message_code = 0;
+*-*
+print("Average is not greater than 45. Message code:", message_code)
+*-*
+}
